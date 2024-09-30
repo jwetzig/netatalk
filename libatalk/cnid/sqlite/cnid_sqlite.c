@@ -773,12 +773,12 @@ static struct _cnid_db *cnid_sqlite_new(const char *volpath)
 					sizeof(struct _cnid_db))) == NULL)
 		return NULL;
 
-        if ((cdb->volpath = strdup(volpath)) == NULL) {
+        if ((cdb->cnid_db_vol = strdup(volpath)) == NULL) {
                 free(cdb);
                 return NULL;
         }
 
-	cdb->flags = CNID_FLAG_PERSISTENT | CNID_FLAG_LAZY_INIT;
+	cdb->cnid_db_flags = CNID_FLAG_PERSISTENT | CNID_FLAG_LAZY_INIT;
 
 	cdb->cnid_add = cnid_sqlite_add;
 	cdb->cnid_delete = cnid_sqlite_delete;
@@ -802,7 +802,7 @@ struct _cnid_db *cnid_sqlite_open(struct cnid_open_args *args)
 	CNID_sqlite_private *db = NULL;
 	struct _cnid_db *cdb = NULL;
 	char *sql = NULL;
-	const char *vol = args->dir;
+	const char *vol = args->cnid_args_vol;
 	sqlite3_stmt *transient_stmt = NULL;
 
 	EC_NULL(cdb = cnid_sqlite_new(vol));
