@@ -36,7 +36,7 @@ option(
 option(
     'with-cnid-sqlite-backend',
     type: 'boolean',
-    value: false,
+    value: true,
     description: 'Compile SQLite CNID scheme',
 )
 option(
