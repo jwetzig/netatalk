@@ -1,4 +1,4 @@
-libcnid_sqlite_sources = ['cnid_sqlite.c', 'sqlite3.c', 'sqlite3.h']
+libcnid_sqlite_sources = ['cnid_sqlite.c']
 
 libcnid_sqlite = static_library(
     'cnid_sqlite',
