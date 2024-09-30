@@ -76,7 +76,7 @@ static int init_prepared_stmt_lookup(CNID_sqlite_private * db)
 		 "WHERE (Name=? AND Did=?) OR (DevNo=? AND InodeNo=?)",
 		 db->cnid_sqlite_voluuid_str));
 	EC_ZERO_LOG(sqlite3_prepare_v2(db->cnid_sqlite_con, sql, strlen(sql), db->cnid_lookup_stmt, NULL));
-	
+
 	EC_ZERO_LOG(sqlite3_bind_text(db->cnid_lookup_stmt, 1, stmt_param_name, strlen(stmt_param_name), SQLITE_STATIC) );
 	EC_ZERO_LOG(sqlite3_bind_int64(db->cnid_lookup_stmt, 2, stmt_param_did) );
 	EC_ZERO_LOG(sqlite3_bind_int64(db->cnid_lookup_stmt, 3, stmt_param_dev) );
@@ -194,7 +194,7 @@ int cnid_sqlite_delete(struct _cnid_db *cdb, const cnid_t id)
 	EC_INIT;
 	CNID_sqlite_private *db;
 
-	if (!cdb || !(db = cdb->_private) || !id) {
+	if (!cdb || !(db = cdb->cnid_db_private) || !id) {
 		LOG(log_error, logtype_cnid,
 		    "cnid_sqlite_delete: Parameter error");
 		errno = CNID_ERR_PARAM;
@@ -226,7 +226,7 @@ void cnid_sqlite_close(struct _cnid_db *cdb)
 		return;
 	}
 
-	if ((db = cdb->_private) != NULL) {
+	if ((db = cdb->cnid_db_private) != NULL) {
 		LOG(log_debug, logtype_cnid,
 		    "closing database connection for volume '%s'",
 		    cdb->cnid_db_vol->v_localname);
@@ -256,7 +256,7 @@ int cnid_sqlite_update(struct _cnid_db *cdb,
 	CNID_sqlite_private *db;
 	cnid_t update_id;
 
-	if (!cdb || !(db = cdb->_private) || !id || !st || !name) {
+	if (!cdb || !(db = cdb->cnid_db_private) || !id || !st || !name) {
 		LOG(log_error, logtype_cnid,
 		    "cnid_update: Parameter error");
 		errno = CNID_ERR_PARAM;
@@ -329,7 +329,7 @@ cnid_t cnid_sqlite_lookup(struct _cnid_db *cdb,
 	uint64_t dev = st->st_dev;
 	uint64_t ino = st->st_ino;
 
-	if (!cdb || !(db = cdb->_private) || !st || !name) {
+	if (!cdb || !(db = cdb->cnid_db_private) || !st || !name) {
 		LOG(log_error, logtype_cnid,
 		    "cnid_sqlite_lookup: Parameter error");
 		errno = CNID_ERR_PARAM;
@@ -462,7 +462,7 @@ cnid_t cnid_sqlite_add(struct _cnid_db *cdb,
 	cnid_t id = CNID_INVALID;
 	uint64_t lastid;
 
-	if (!cdb || !(db = cdb->_private) || !st || !name) {
+	if (!cdb || !(db = cdb->cnid_db_private) || !st || !name) {
 		LOG(log_error, logtype_cnid,
 		    "cnid_sqlite_add: Parameter error");
 		errno = CNID_ERR_PARAM;
@@ -578,7 +578,7 @@ cnid_t cnid_sqlite_get(struct _cnid_db *cdb, const cnid_t did, char *name,
 	char *sql = NULL;
 	sqlite3_stmt *transient_stmt = NULL;
 
-	if (!cdb || !(db = cdb->_private) || !name) {
+	if (!cdb || !(db = cdb->cnid_db_private) || !name) {
 		LOG(log_error, logtype_cnid,
 		    "cnid_sqlite_get: Parameter error");
 		errno = CNID_ERR_PARAM;
@@ -634,7 +634,7 @@ char *cnid_sqlite_resolve(struct _cnid_db *cdb, cnid_t * id, void *buffer,
 	sqlite3_stmt *transient_stmt = NULL;
 	CNID_sqlite_private *db;
 
-	if (!cdb || !(db = cdb->_private)) {
+	if (!cdb || !(db = cdb->cnid_db_private)) {
 		LOG(log_error, logtype_cnid,
 		    "cnid_sqlite_get: Parameter error");
 		errno = CNID_ERR_PARAM;
@@ -682,7 +682,7 @@ int cnid_sqlite_getstamp(struct _cnid_db *cdb, void *buffer,
 	sqlite3_stmt *transient_stmt = NULL;
 	CNID_sqlite_private *db;
 
-	if (!cdb || !(db = cdb->_private)) {
+	if (!cdb || !(db = cdb->cnid_db_private)) {
 		LOG(log_error, logtype_cnid, "cnid_find: Parameter error");
 		errno = CNID_ERR_PARAM;
 		return CNID_INVALID;
@@ -696,7 +696,7 @@ int cnid_sqlite_getstamp(struct _cnid_db *cdb, void *buffer,
         EC_NEG1(asprintf
                 (&sql,
                   "SELECT Stamp FROM volumes WHERE VolPath='%s'",
-                                cdb->cnid_db_vol->v_path)); 
+                                cdb->cnid_db_vol->v_path));
 
         EC_ZERO_LOG(sqlite3_prepare_v2
                     (db->cnid_sqlite_con, sql, strlen(sql), &transient_stmt, NULL));
@@ -741,7 +741,7 @@ int cnid_sqlite_wipe(struct _cnid_db *cdb)
 	EC_INIT;
 	CNID_sqlite_private *db;
 
-	if (!cdb || !(db = cdb->_private)) {
+	if (!cdb || !(db = cdb->cnid_db_private)) {
 		LOG(log_error, logtype_cnid, "cnid_wipe: Parameter error");
 		errno = CNID_ERR_PARAM;
 		return -1;
@@ -810,7 +810,7 @@ struct _cnid_db *cnid_sqlite_open(struct cnid_open_args *args)
 		(CNID_sqlite_private *) calloc(1,
 					       sizeof
 					       (CNID_sqlite_private)));
-	cdb->_private = db;
+	cdb->cnid_db_private = db;
 
 	/* Initialize and connect to sqlite3 database */
 	sqlite3_initialize();
