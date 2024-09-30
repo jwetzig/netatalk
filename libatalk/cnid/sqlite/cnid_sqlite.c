@@ -814,7 +814,7 @@ struct _cnid_db *cnid_sqlite_open(struct cnid_open_args *args)
 
 	/* Initialize and connect to sqlite3 database */
 	sqlite3_initialize();
-	EC_ZERO( sqlite3_open_v2("file:/var/db/netatalk-classic/cnid.sqlite",
+	EC_ZERO( sqlite3_open_v2("file:/var/db/netatalk/cnid.sqlite",
 			    &db->cnid_sqlite_con,
 			    SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE, NULL));
 
